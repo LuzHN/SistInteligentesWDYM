@@ -115,7 +115,7 @@ public class WDYM extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -135,12 +135,13 @@ public class WDYM extends javax.swing.JFrame {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         connection = DriverManager.getConnection(url, username, password);
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado) VALUES ('DIR');");
+            /*PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado) VALUES ('DIR');");
             int status = ps.executeUpdate();
             
              if (status != 0) {
                 System.out.println("Comando ingresado");
             }
+            */
         } catch (Exception e) {
             System.out.println(e.toString());
         }
