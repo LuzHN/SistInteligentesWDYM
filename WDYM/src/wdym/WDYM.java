@@ -5,10 +5,14 @@
  */
 package wdym;
 
+import java.awt.event.KeyEvent;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -19,14 +23,39 @@ public class WDYM extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      */
-    
+    String directorio = new File("").getAbsolutePath();
+
     static Connection connection = null;
     static String databasename = "comandosdb";
     static String url = "jdbc:mysql://localhost:3306/" + databasename;
     static String username = "root";
     static String password = "1234";
+    
+    boolean esperandoLS = false;
+   
+    //declaraciones regex
+    String patronLS = "((l(w|a|d|s)|(k|o|l)s))";
+    Pattern patternLS = Pattern.compile(patronLS);
+    
+    String patronMKDIR = 
+             "("
+            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la m buena
+            + "|" 
+            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la k buena
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la d buena 
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))" //combinaciones posibles con la i buena 
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)" //combinaciones posibles con la r buena 
+            + ")";
+    
+    Pattern patternMKDIR = Pattern.compile(patronMKDIR);
+
     public WDYM() {
         initComponents();
+        ConsoleOut.setText(directorio + ">");
+
     }
 
     /**
@@ -41,43 +70,55 @@ public class WDYM extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         ConsoleOut = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
         ConsoleInput = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 0, 0));
 
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel1.setForeground(new java.awt.Color(0, 0, 0));
+
+        ConsoleOut.setEditable(false);
+        ConsoleOut.setBackground(new java.awt.Color(0, 0, 0));
         ConsoleOut.setColumns(20);
+        ConsoleOut.setFont(new java.awt.Font("Lucida Console", 0, 11)); // NOI18N
+        ConsoleOut.setForeground(new java.awt.Color(255, 255, 255));
         ConsoleOut.setRows(5);
         jScrollPane1.setViewportView(ConsoleOut);
 
+        jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        ConsoleInput.setBackground(new java.awt.Color(0, 0, 0));
         ConsoleInput.setColumns(20);
+        ConsoleInput.setFont(new java.awt.Font("Lucida Console", 0, 11)); // NOI18N
+        ConsoleInput.setForeground(new java.awt.Color(255, 255, 255));
         ConsoleInput.setRows(5);
         ConsoleInput.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 ConsoleInputKeyPressed(evt);
             }
         });
-        jScrollPane2.setViewportView(ConsoleInput);
+        jScrollPane3.setViewportView(ConsoleInput);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -91,9 +132,10 @@ public class WDYM extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -101,7 +143,85 @@ public class WDYM extends javax.swing.JFrame {
 
     private void ConsoleInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ConsoleInputKeyPressed
         // TODO add your handling code here:
-        
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            String texto = ConsoleInput.getText();
+
+            Matcher m = patternLS.matcher(texto);
+            
+            Matcher m2 = patternMKDIR.matcher(texto);
+            
+            if(esperandoLS){
+                if(texto.trim().equals("y")){  // agregar a BD
+                    
+                    
+                    //....
+                    
+                    esperandoLS = false;
+                } else{
+                    esperandoLS = false;
+                    ConsoleOut.append("\n" + directorio + ">" + texto.trim());
+                    ConsoleInput.setText("");
+                }
+            }
+            
+            if (m.find()) { //encontro algo cerca de 'ls'
+                
+                if(!texto.equals("ls")){
+                    
+                    //revisar si ya existe en la BD
+                    
+                    /*
+                        if(dato existe en BD){
+                            ejecutar ls
+                        } else { si no existe, pregunta al usuario si existe o no
+                            el codigo de abajo de este if
+                        }
+                    */
+
+                    ConsoleOut.append("\n" + directorio + ">" + "Did you mean 'ls'? [y/n]" + "\n ...");
+                    ConsoleInput.setText("");
+                    esperandoLS = true; //esperando respuesta
+                    System.out.println("Found value: " + m.group(0));
+                }
+                
+                
+            } else {
+                System.out.println("NO MATCH");
+            }
+            
+            if (m2.find()) { //encontro mkdir
+                System.out.println("Found value: " + m2.group(0));
+            } else {
+                System.out.println("NO MATCH");
+            }
+            
+            if (texto.trim().equals("clear")) {
+                ConsoleOut.setText("");
+                ConsoleOut.setText(directorio + ">");
+                ConsoleInput.setText("");
+            } else if (texto.trim().equals("ls")) {
+                File folder = new File(directorio);
+                File[] listOfFiles = folder.listFiles();
+
+                ConsoleOut.append("\n" + directorio + ">" + texto.trim() + "\n");
+                ConsoleInput.setText("");
+
+                for (File file : listOfFiles) {
+                    if (file.isDirectory()) {
+                        ConsoleOut.append(file.getName() + "(folder)" + "\n");
+                    } else {
+                        ConsoleOut.append(file.getName() + "\n");
+
+                    }
+                }
+                ConsoleOut.append("\n" + directorio + ">");
+
+            } else {
+                ConsoleOut.append("\n" + directorio + ">" + texto.trim());
+                ConsoleInput.setText("");
+            }
+
+        }
     }//GEN-LAST:event_ConsoleInputKeyPressed
 
     /**
@@ -131,7 +251,7 @@ public class WDYM extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         connection = DriverManager.getConnection(url, username, password);
         try {
@@ -141,11 +261,11 @@ public class WDYM extends javax.swing.JFrame {
              if (status != 0) {
                 System.out.println("Comando ingresado");
             }
-            */
+             */
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -159,6 +279,6 @@ public class WDYM extends javax.swing.JFrame {
     private javax.swing.JTextArea ConsoleOut;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     // End of variables declaration//GEN-END:variables
 }
