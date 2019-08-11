@@ -10,7 +10,11 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,18 +34,31 @@ public class WDYM extends javax.swing.JFrame {
     static String url = "jdbc:mysql://localhost:3306/" + databasename;
     static String username = "root";
     static String password = "1234";
-    
+
     boolean esperandoLS = false;
-   
+    boolean esperandoMKDIR = false;
+
     //declaraciones regex
-    String patronLS = "((l(w|a|d|s)|(k|o|l)s))";
-    Pattern patternLS = Pattern.compile(patronLS);
-    
-    String patronMKDIR = 
-             "("
+    String patronLS = "((l(w|a|d|s|x|z)|(j|m|k|o|l)s))";
+
+    String patronMKDIR
+            = "("
+            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la m buena
+            + "|"
+            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la k buena
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la d buena 
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la i buena 
+            + "|"
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)( )[a-zA-Z0-9]+" //combinaciones posibles con la r buena 
+            + ")";
+
+    String patronMKDIRSinParametro
+            = "("
             + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la m buena
-            + "|" 
-            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la k buena
+            + "|"
+            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))]" //combinaciones posibles con la k buena
             + "|"
             + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la d buena 
             + "|"
@@ -49,10 +66,23 @@ public class WDYM extends javax.swing.JFrame {
             + "|"
             + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)" //combinaciones posibles con la r buena 
             + ")";
-    
-    Pattern patternMKDIR = Pattern.compile(patronMKDIR);
 
-    public WDYM() {
+    ArrayList<String> comandos = new ArrayList<>();
+
+    String LSInput = "";
+    String MKDIRInput = "";
+    boolean ImprimirComandoMisc = true;
+
+    public WDYM() throws SQLException {
+
+        String query = ("SELECT ComandoIngresado FROM comandosdb.comandos;");
+        PreparedStatement ps = connection.prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            String comando = rs.getString("ComandoIngresado");
+            comandos.add(comando);
+        }
         initComponents();
         ConsoleOut.setText(directorio + ">");
 
@@ -72,6 +102,9 @@ public class WDYM extends javax.swing.JFrame {
         ConsoleOut = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         ConsoleInput = new javax.swing.JTextArea();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        BorrarBD = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
@@ -121,6 +154,20 @@ public class WDYM extends javax.swing.JFrame {
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        jMenu1.setText("File");
+
+        BorrarBD.setText("Borrar");
+        BorrarBD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BorrarBDActionPerformed(evt);
+            }
+        });
+        jMenu1.add(BorrarBD);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,85 +191,190 @@ public class WDYM extends javax.swing.JFrame {
     private void ConsoleInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ConsoleInputKeyPressed
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+
+            ImprimirComandoMisc = true;
+
             String texto = ConsoleInput.getText();
 
-            Matcher m = patternLS.matcher(texto);
-            
-            Matcher m2 = patternMKDIR.matcher(texto);
-            
-            if(esperandoLS){
-                if(texto.trim().equals("y")){  // agregar a BD
-                    
-                    
-                    //....
-                    
+            //revisar si esta el cmd esperando respuesta o no
+            if (esperandoLS) {
+                if (texto.trim().equals("y") || texto.trim().equals("Y")) {  // agregar a BD
+
+                    try {
+                        PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado, comandoreal) VALUES ('" + LSInput + "','ls');");
+                        int status = ps.executeUpdate();
+
+                        if (status != 0) {
+                            System.out.println("Comando referencia a ls agregado a BD exitosamente.");
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                    }
+
                     esperandoLS = false;
-                } else{
+                } else { //si ingreso n o cualquier otro caracter
                     esperandoLS = false;
-                    ConsoleOut.append("\n" + directorio + ">" + texto.trim());
+                    ConsoleOut.append("\n" + directorio + ">" + texto.trim() + "\n");
+                    ImprimirComandoMisc = false;
                     ConsoleInput.setText("");
                 }
             }
-            
-            if (m.find()) { //encontro algo cerca de 'ls'
-                
-                if(!texto.equals("ls")){
-                    
+
+            if (esperandoMKDIR) {
+                if (texto.trim().equals("y") || texto.trim().equals("Y")) {  // agregar a BD
+
+                    try {
+                        PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado, comandoreal) VALUES ('" + texto.trim() + "','mkdir');");
+                        int status = ps.executeUpdate();
+
+                        if (status != 0) {
+                            System.out.println("Comando referencia a mkdir agregado a BD exitosamente.");
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                    }
+                    esperandoMKDIR = false;
+                } else { //si ingreso n o cualquier otro caracter
+                    esperandoMKDIR = false;
+                    ConsoleOut.append("\n" + directorio + ">" + texto.trim());
+                    ImprimirComandoMisc = false;
+                    ConsoleInput.setText("");
+                }
+            }
+
+            if (texto.matches(patronMKDIRSinParametro)) { //encontro un mkdir sin parametro
+                ConsoleOut.append("\n" + directorio + ">" + "Falta parametro a mkdir, favor usar mkdir [nombre de folder]");
+                ConsoleInput.setText("");
+            }
+
+            //busqueda de regex
+            if (texto.trim().matches(patronLS)) { //encontro algo cerca de 'ls'
+
+                if (!texto.trim().equals("ls")) { //cualquier otra cosa que no es ls pero es cerca
+
+                    ArrayList<String> search = new ArrayList<>();
+
+                    try {
+                        String query = ("SELECT * FROM comandosdb.comandos WHERE ComandoIngresado = '" + texto.trim() + "';");
+                        PreparedStatement ps = connection.prepareStatement(query);
+                        ResultSet rs = ps.executeQuery();
+
+                        while (rs.next()) {
+                            String comando = rs.getString("ComandoIngresado");
+                            search.add(comando);
+                        }
+
+                        if (search.size() == 1) {
+                            correrLS(texto.trim());
+                            ImprimirComandoMisc = false;
+                        } else {
+                            ConsoleOut.append("\n" + directorio + ">" + texto.trim() + "\n");
+                            ConsoleOut.append("Did you mean 'ls'? [y/n]" + "\n ...");
+                            ConsoleInput.setText("");
+                            LSInput = texto.trim();
+                            esperandoLS = true; //esperando respuesta
+                            ImprimirComandoMisc = false;
+                        }
+
+                    } catch (Exception e) {
+                    }
+
+                } else { //el comando ingresado ES ls
+                    correrLS("ls");
+                    ImprimirComandoMisc = false;
+                }
+
+            } else {
+            }
+
+            if (texto.matches(patronMKDIR)) { //encontro mkdir
+                if (!texto.equals("mkdir")) { //cualquier otra cosa que no es mkdir pero es cerca
+
                     //revisar si ya existe en la BD
-                    
                     /*
                         if(dato existe en BD){
-                            ejecutar ls
+                            ejecutar mkdir
                         } else { si no existe, pregunta al usuario si existe o no
                             el codigo de abajo de este if
                         }
-                    */
-
-                    ConsoleOut.append("\n" + directorio + ">" + "Did you mean 'ls'? [y/n]" + "\n ...");
+                     */
+                    ConsoleOut.append("\n" + directorio + ">" + "Did you mean 'mkdir'? [y/n]" + "\n ...");
                     ConsoleInput.setText("");
-                    esperandoLS = true; //esperando respuesta
-                    System.out.println("Found value: " + m.group(0));
+                    esperandoMKDIR = true; //esperando respuesta
+                } else { //el comando ingresado ES MKDIR
+                    correrMKDIR("mkdir");
+                    ImprimirComandoMisc = false;
                 }
-                
-                
             } else {
-                System.out.println("NO MATCH");
             }
-            
-            if (m2.find()) { //encontro mkdir
-                System.out.println("Found value: " + m2.group(0));
-            } else {
-                System.out.println("NO MATCH");
-            }
-            
-            if (texto.trim().equals("clear")) {
+
+            //cualquier otro comando o misc.
+            if (texto.trim().equals("clear")) { //solo para limpiar
                 ConsoleOut.setText("");
                 ConsoleOut.setText(directorio + ">");
                 ConsoleInput.setText("");
-            } else if (texto.trim().equals("ls")) {
-                File folder = new File(directorio);
-                File[] listOfFiles = folder.listFiles();
-
-                ConsoleOut.append("\n" + directorio + ">" + texto.trim() + "\n");
-                ConsoleInput.setText("");
-
-                for (File file : listOfFiles) {
-                    if (file.isDirectory()) {
-                        ConsoleOut.append(file.getName() + "(folder)" + "\n");
-                    } else {
-                        ConsoleOut.append(file.getName() + "\n");
-
-                    }
-                }
-                ConsoleOut.append("\n" + directorio + ">");
-
-            } else {
+            } else if (ImprimirComandoMisc) { // cualquier otra cosa que se ha ingresado
                 ConsoleOut.append("\n" + directorio + ">" + texto.trim());
                 ConsoleInput.setText("");
             }
 
         }
     }//GEN-LAST:event_ConsoleInputKeyPressed
+
+    private void BorrarBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BorrarBDActionPerformed
+        // TODO add your handling code here:
+        try {
+            PreparedStatement ps = connection.prepareStatement("truncate table comandosdb.comandos;");
+            int status = ps.executeUpdate();
+
+            if (status != 0) {
+                System.out.println("BD borrada.");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }//GEN-LAST:event_BorrarBDActionPerformed
+
+    public void correrLS(String texto) {
+        File folder = new File(directorio);
+        File[] listOfFiles = folder.listFiles();
+
+        ConsoleOut.append(texto.trim() + "\n");
+        ConsoleInput.setText("");
+
+        for (File file : listOfFiles) {
+            if (file.isDirectory()) {
+                ConsoleOut.append(file.getName() + "(folder)" + "\n");
+            } else {
+                ConsoleOut.append(file.getName() + "\n");
+
+            }
+        }
+        ConsoleOut.append("\n" + directorio + ">");
+    }
+
+    public boolean correrMKDIR(String texto) {
+        // create an abstract pathname (File object) 
+        File f = new File(directorio + "/" + texto);
+
+        // check if the directory can be created 
+        // using the abstract path name 
+        if (f.mkdir()) {
+
+            // display that the directory is created 
+            // as the function returned true 
+            System.out.println("Directory is created");
+            return true;
+        } else {
+            // display that the directory cannot be created 
+            // as the function returned false 
+            System.out.println("Directory cannot be created");
+            return false;
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -269,14 +421,21 @@ public class WDYM extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WDYM().setVisible(true);
+                try {
+                    new WDYM().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(WDYM.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem BorrarBD;
     private javax.swing.JTextArea ConsoleInput;
     private javax.swing.JTextArea ConsoleOut;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
