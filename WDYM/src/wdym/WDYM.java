@@ -43,28 +43,28 @@ public class WDYM extends javax.swing.JFrame {
 
     String patronMKDIR
             = "("
-            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la m buena
+            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))(\\s)[a-zA-Z0-9\\s]+" //combinaciones posibles con la m buena
             + "|"
-            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la k buena
+            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))(\\s)[a-zA-Z0-9\\s]+" //combinaciones posibles con la k buena
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la d buena 
+            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))(\\s)[a-zA-Z0-9\\s]+" //combinaciones posibles con la d buena 
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))( )[a-zA-Z0-9]+" //combinaciones posibles con la i buena 
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))(\\s)[a-zA-Z0-9\\s]+" //combinaciones posibles con la i buena 
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)( )[a-zA-Z0-9]+" //combinaciones posibles con la r buena 
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)(\\s)[a-zA-Z0-9\\s]+" //combinaciones posibles con la r buena 
             + ")";
 
     String patronMKDIRSinParametro
             = "("
-            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la m buena
+            + "(m(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))(\\s)*" //combinaciones posibles con la m buena
             + "|"
-            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))]" //combinaciones posibles con la k buena
+            + "((m|k|j|n|)k(d|e|x|c|f)(i|8|u|o|k)(r|4|e|t|f))](\\s)*" //combinaciones posibles con la k buena
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))" //combinaciones posibles con la d buena 
+            + "((m|k|j|n|)(m|k|i|j|l)d(i|8|u|o|k)(r|4|e|t|f))(\\s)*" //combinaciones posibles con la d buena 
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))" //combinaciones posibles con la i buena 
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)i(r|4|e|t|f))(\\s)*" //combinaciones posibles con la i buena 
             + "|"
-            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)" //combinaciones posibles con la r buena 
+            + "((m|k|j|n|)(m|k|i|j|l)(d|e|x|c|f)(i|8|u|o|k)r)(\\s)*" //combinaciones posibles con la r buena 
             + ")";
 
     ArrayList<String> comandos = new ArrayList<>();
@@ -117,12 +117,13 @@ public class WDYM extends javax.swing.JFrame {
         ConsoleOut.setColumns(20);
         ConsoleOut.setFont(new java.awt.Font("Lucida Console", 0, 11)); // NOI18N
         ConsoleOut.setForeground(new java.awt.Color(255, 255, 255));
+        ConsoleOut.setLineWrap(true);
         ConsoleOut.setRows(5);
         jScrollPane1.setViewportView(ConsoleOut);
 
         jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-        ConsoleInput.setBackground(new java.awt.Color(0, 0, 0));
+        ConsoleInput.setBackground(new java.awt.Color(153, 153, 153));
         ConsoleInput.setColumns(20);
         ConsoleInput.setFont(new java.awt.Font("Lucida Console", 0, 11)); // NOI18N
         ConsoleInput.setForeground(new java.awt.Color(255, 255, 255));
@@ -141,7 +142,7 @@ public class WDYM extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
                     .addComponent(jScrollPane3))
                 .addContainerGap())
         );
@@ -156,7 +157,7 @@ public class WDYM extends javax.swing.JFrame {
 
         jMenu1.setText("File");
 
-        BorrarBD.setText("Borrar");
+        BorrarBD.setText("Limpiar BD");
         BorrarBD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BorrarBDActionPerformed(evt);
@@ -192,7 +193,7 @@ public class WDYM extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
 
-            ImprimirComandoMisc = true;
+            ImprimirComandoMisc = true; //reset variable para imprimir lo que sea que no sea mkdir o ls o clear
 
             String texto = ConsoleInput.getText();
 
@@ -205,7 +206,7 @@ public class WDYM extends javax.swing.JFrame {
                         int status = ps.executeUpdate();
 
                         if (status != 0) {
-                            System.out.println("Comando referencia a ls agregado a BD exitosamente.");
+                            System.out.println("Comando " + LSInput + " agregado a la BD, referenciando a ls.");
                         }
 
                     } catch (Exception e) {
@@ -225,11 +226,11 @@ public class WDYM extends javax.swing.JFrame {
                 if (texto.trim().equals("y") || texto.trim().equals("Y")) {  // agregar a BD
 
                     try {
-                        PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado, comandoreal) VALUES ('" + texto.trim() + "','mkdir');");
+                        PreparedStatement ps = connection.prepareStatement("INSERT INTO comandos(comandoingresado, comandoreal) VALUES ('" + MKDIRInput.trim() + "','mkdir');");
                         int status = ps.executeUpdate();
 
                         if (status != 0) {
-                            System.out.println("Comando referencia a mkdir agregado a BD exitosamente.");
+                            System.out.println("Comando '" + MKDIRInput + "' agregado a la BD, referenciando a MKDIR.");
                         }
 
                     } catch (Exception e) {
@@ -242,11 +243,6 @@ public class WDYM extends javax.swing.JFrame {
                     ImprimirComandoMisc = false;
                     ConsoleInput.setText("");
                 }
-            }
-
-            if (texto.matches(patronMKDIRSinParametro)) { //encontro un mkdir sin parametro
-                ConsoleOut.append("\n" + directorio + ">" + "Falta parametro a mkdir, favor usar mkdir [nombre de folder]");
-                ConsoleInput.setText("");
             }
 
             //busqueda de regex
@@ -279,6 +275,7 @@ public class WDYM extends javax.swing.JFrame {
                         }
 
                     } catch (Exception e) {
+                        e.toString();
                     }
 
                 } else { //el comando ingresado ES ls
@@ -286,34 +283,62 @@ public class WDYM extends javax.swing.JFrame {
                     ImprimirComandoMisc = false;
                 }
 
-            } else {
             }
 
-            if (texto.matches(patronMKDIR)) { //encontro mkdir
-                if (!texto.equals("mkdir")) { //cualquier otra cosa que no es mkdir pero es cerca
-
-                    //revisar si ya existe en la BD
-                    /*
-                        if(dato existe en BD){
-                            ejecutar mkdir
-                        } else { si no existe, pregunta al usuario si existe o no
-                            el codigo de abajo de este if
-                        }
-                     */
-                    ConsoleOut.append("\n" + directorio + ">" + "Did you mean 'mkdir'? [y/n]" + "\n ...");
-                    ConsoleInput.setText("");
-                    esperandoMKDIR = true; //esperando respuesta
-                } else { //el comando ingresado ES MKDIR
-                    correrMKDIR("mkdir");
-                    ImprimirComandoMisc = false;
-                }
+            if (texto.trim().matches(patronMKDIRSinParametro)) { //encontro un mkdir sin parametro
+                ConsoleOut.append("\n" + directorio + ">" + "Falta parametro a mkdir, favor usar mkdir [nombre de folder]");
+                ConsoleInput.setText("");
+                ImprimirComandoMisc = false;
             } else {
+                if (texto.trim().matches(patronMKDIR)) { //encontro mkdir
+
+                    String[] split = texto.trim().split(" ");
+
+                    if (!split[0].trim().equals("mkdir")) { //cualquier otra cosa que no es mkdir pero es cerca
+
+                        ArrayList<String> search = new ArrayList<>();
+
+                        try {
+                            String query = ("SELECT * FROM comandosdb.comandos WHERE ComandoIngresado = '" + split[0].trim() + "';");
+                            PreparedStatement ps = connection.prepareStatement(query);
+                            ResultSet rs = ps.executeQuery();
+
+                            while (rs.next()) {
+                                String comando = rs.getString("ComandoIngresado");
+                                search.add(comando);
+                            }
+
+                            if (search.size() == 1) {
+                                
+                                CheckLength(split);
+                                ImprimirComandoMisc = false;
+                                ConsoleInput.setText("");
+                            } else {
+                                ConsoleOut.append("\n" + directorio + ">" + texto.trim() + "\n");
+                                ConsoleOut.append("Did you mean 'mkdir [foldername]'? [y/n]" + "\n ...");
+                                ConsoleInput.setText("");
+                                MKDIRInput = split[0];
+                                esperandoMKDIR = true; //esperando respuesta
+                                ImprimirComandoMisc = false;
+
+                            }
+
+                        } catch (Exception e) {
+
+                        }
+
+                    } else { //si el comando mkdir esta correcto
+
+                        CheckLength(split);
+
+                    }
+                }
             }
 
             //cualquier otro comando o misc.
             if (texto.trim().equals("clear")) { //solo para limpiar
                 ConsoleOut.setText("");
-                ConsoleOut.setText(directorio + ">");
+                ConsoleOut.setText(directorio + ">clear");
                 ConsoleInput.setText("");
             } else if (ImprimirComandoMisc) { // cualquier otra cosa que se ha ingresado
                 ConsoleOut.append("\n" + directorio + ">" + texto.trim());
@@ -322,6 +347,24 @@ public class WDYM extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_ConsoleInputKeyPressed
+
+    public void CheckLength(String[] split) { //revisa si el comando de mkdir tiene varias palabras
+        if (split.length >= 3) { //si el nombre son varias palabras o numeros
+            String foldername = "";
+
+            for (int i = 1; i < split.length; i++) {
+                foldername += split[i] + " ";
+            }
+            correrMKDIR(foldername);
+            ConsoleInput.setText("");
+            ImprimirComandoMisc = false;
+
+        } else { //si el nombre solo es una palabra
+            correrMKDIR(split[1]);
+            ConsoleInput.setText("");
+            ImprimirComandoMisc = false;
+        }
+    }
 
     private void BorrarBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BorrarBDActionPerformed
         // TODO add your handling code here:
@@ -357,20 +400,15 @@ public class WDYM extends javax.swing.JFrame {
     }
 
     public boolean correrMKDIR(String texto) {
-        // create an abstract pathname (File object) 
         File f = new File(directorio + "/" + texto);
 
-        // check if the directory can be created 
-        // using the abstract path name 
         if (f.mkdir()) {
 
-            // display that the directory is created 
-            // as the function returned true 
             System.out.println("Directory is created");
+            ConsoleOut.append("\n" + directorio + ">Directorio '" + texto + "' fue creado exitosamente." + "\n");
             return true;
         } else {
-            // display that the directory cannot be created 
-            // as the function returned false 
+            ConsoleOut.append("\n" + directorio + ">Directorio '" + texto + "' ya existe." + "\n");
             System.out.println("Directory cannot be created");
             return false;
         }
